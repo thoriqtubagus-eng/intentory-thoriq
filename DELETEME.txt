@@ -1,0 +1,15 @@
+Functional Cluster	Activity	Initiator	Approver	Key Data / Notes
+1. Catalog & Master Data	Manage Items	Staff	N/A	CRUD (SKU, Cat, Stock, MinStock, Location)
+ 	Manage Categories	Staff	N/A	Organize items
+ 	Manage Suppliers	Staff	N/A	CRUD (Name, Contact, Address)
+2. Inbound Operations	Create Purchase Order	Staff	Head	Link Supplier, Items, Expected Date
+ 	Approve Purchase Order	N/A	Head	Approve/Reject with Reason
+ 	Record Incoming Goods	Staff	Head	Link Supplier, Reference #, Items
+ 	Approve Incoming Goods	N/A	Head	Finalize stock increase
+3. Outbound Operations	Create Item Request	Staff	Head	Dept, Requested By, Required Date
+ 	Approve Item Request	N/A	Head	Approve/Reject with Reason
+ 	Record Outgoing Goods	Staff	Head	Destination, Recipient, Items
+ 	Approve Outgoing Goods	N/A	Head	Finalize stock decrease
+4. Inventory & Analytics	Monitor Dashboard	Both	N/A	Alerts: Low stock, Pending approvals
+ 	View Stock Movements	Both	N/A	Full audit trail of all transactions
+ 	Generate Reports	Both	N/A	Summary of stock, transactions
