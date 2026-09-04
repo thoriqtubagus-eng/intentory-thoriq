@@ -10,8 +10,7 @@ import {
   StockMovement,
 } from '@/types';
 
-// API Base URL - change this to your backend URL
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // Token storage
 const TOKEN_KEY = 'auth_token';
