@@ -1,5 +1,6 @@
-const { prisma } = require("../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../_lib/auth");
+const { prisma } = require("../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../_lib/auth");
+const { parseBody } = require("../_lib/utils");
 
 function generateOrderNumber() {
   const now = new Date();
@@ -41,7 +42,8 @@ module.exports = async function handler(req, res) {
         return jsonError(res, 403, "Forbidden");
       }
 
-      const { supplierId, items, notes, expectedDate } = req.body;
+      const body = await parseBody(req);
+      const { supplierId, items, notes, expectedDate } = body;
 
       if (!supplierId || !items || !Array.isArray(items) || items.length === 0) {
         return jsonError(res, 400, "supplierId and items array are required");

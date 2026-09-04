@@ -1,5 +1,6 @@
-const { prisma } = require("../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../_lib/auth");
+const { prisma } = require("../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../_lib/auth");
+const { parseBody } = require("../_lib/utils");
 
 module.exports = async function handler(req, res) {
   const { id } = req.query;
@@ -32,7 +33,8 @@ module.exports = async function handler(req, res) {
       const existing = await prisma.item.findUnique({ where: { id } });
       if (!existing) return jsonError(res, 404, "Item not found");
 
-      const { code, name, description, categoryId, unit, minStock, stock, location } = req.body;
+      const body = await parseBody(req);
+      const { code, name, description, categoryId, unit, minStock, stock, location } = body;
 
       if (categoryId) {
         const category = await prisma.category.findUnique({

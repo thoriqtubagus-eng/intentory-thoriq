@@ -1,5 +1,6 @@
-const { prisma } = require("../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../_lib/auth");
+const { prisma } = require("../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../_lib/auth");
+const { parseBody } = require("../_lib/utils");
 
 module.exports = async function (req, res) {
   try {
@@ -7,9 +8,7 @@ module.exports = async function (req, res) {
     if (!user) return jsonError(res, 401, "Unauthorized");
 
     if (req.method === "GET") {
-      const categories = await prisma.category.findMany({
-        include: { _count: { select: { items: true } } },
-      });
+      const categories = await prisma.category.findMany();
       return res.status(200).json(categories);
     }
 
@@ -17,7 +16,8 @@ module.exports = async function (req, res) {
       if (!authorize(user, "admin", "warehouse_staff"))
         return jsonError(res, 403, "Forbidden");
 
-      const { name, description } = req.body;
+      const body = await parseBody(req);
+      const { name, description } = body;
       if (!name) return jsonError(res, 400, "Name is required");
 
       const category = await prisma.category.create({
@@ -28,6 +28,7 @@ module.exports = async function (req, res) {
 
     return jsonError(res, 405, "Method not allowed");
   } catch (error) {
+    console.error("Categories error:", error.message);
     return jsonError(res, 500, error.message);
   }
 };

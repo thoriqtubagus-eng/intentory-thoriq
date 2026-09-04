@@ -1,5 +1,6 @@
-const { prisma } = require("../../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../../_lib/auth");
+const { prisma } = require("../../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../../_lib/auth");
+const { parseBody } = require("../../_lib/utils");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
@@ -14,9 +15,10 @@ module.exports = async function handler(req, res) {
     }
 
     const { id } = req.query;
-    const { items: rejectedItemIds, signatureImage } = req.body;
+    const body = await parseBody(req);
+    const { items: rejectedItemIds, signatureImage } = body;
 
-    const outgoing = await prisma.outgoingGood.findUnique({
+    const outgoing = await prisma.outgoingGoods.findUnique({
       where: { id },
       include: { items: true },
     });
@@ -31,12 +33,12 @@ module.exports = async function handler(req, res) {
 
     const result = await prisma.$transaction(async (tx) => {
       if (rejectedItemIds && rejectedItemIds.length > 0) {
-        await tx.outgoingGoodItem.deleteMany({
+        await tx.outgoingGoodsItem.deleteMany({
           where: { id: { in: rejectedItemIds } },
         });
       }
 
-      const approvedOutgoing = await tx.outgoingGood.update({
+      const approvedOutgoing = await tx.outgoingGoods.update({
         where: { id },
         data: {
           status: "APPROVED",

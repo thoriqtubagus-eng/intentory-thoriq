@@ -1,5 +1,5 @@
-const { prisma } = require("../../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../../_lib/auth");
+const { prisma } = require("../../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../../_lib/auth");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
@@ -15,13 +15,13 @@ module.exports = async function handler(req, res) {
 
     const { id } = req.query;
 
-    const existing = await prisma.outgoingGood.findUnique({ where: { id } });
+    const existing = await prisma.outgoingGoods.findUnique({ where: { id } });
     if (!existing) return jsonError(res, 404, "Outgoing good not found");
     if (existing.status !== "DRAFT") {
       return jsonError(res, 400, "Only DRAFT outgoing goods can be submitted");
     }
 
-    const updated = await prisma.outgoingGood.update({
+    const updated = await prisma.outgoingGoods.update({
       where: { id },
       data: { status: "WAITING_APPROVAL" },
     });

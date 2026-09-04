@@ -1,5 +1,6 @@
-const { prisma } = require("../../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../../_lib/auth");
+const { prisma } = require("../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../_lib/auth");
+const { parseBody } = require("../_lib/utils");
 
 module.exports = async function handler(req, res) {
   const { id } = req.query;
@@ -9,7 +10,7 @@ module.exports = async function handler(req, res) {
       const user = await authenticate(req);
       if (!user) return jsonError(res, 401, "Unauthorized");
 
-      const outgoingGood = await prisma.outgoingGood.findUnique({
+      const outgoingGoods = await prisma.outgoingGoods.findUnique({
         where: { id },
         include: {
           approvedBy: true,
@@ -29,9 +30,9 @@ module.exports = async function handler(req, res) {
           },
         },
       });
-      if (!outgoingGood) return jsonError(res, 404, "Outgoing good not found");
+      if (!outgoingGoods) return jsonError(res, 404, "Outgoing good not found");
 
-      return res.status(200).json(outgoingGood);
+      return res.status(200).json(outgoingGoods);
     } catch (error) {
       return jsonError(res, 500, "Internal server error");
     }
@@ -45,20 +46,21 @@ module.exports = async function handler(req, res) {
         return jsonError(res, 403, "Forbidden");
       }
 
-      const existing = await prisma.outgoingGood.findUnique({ where: { id } });
+      const existing = await prisma.outgoingGoods.findUnique({ where: { id } });
       if (!existing) return jsonError(res, 404, "Outgoing good not found");
       if (existing.status !== "DRAFT") {
         return jsonError(res, 400, "Only DRAFT outgoing goods can be edited");
       }
 
-      const { destination, recipientName, notes, items } = req.body;
+      const body = await parseBody(req);
+      const { destination, recipientName, notes, items } = body;
 
       const updated = await prisma.$transaction(async (tx) => {
-        await tx.outgoingGoodItem.deleteMany({
-          where: { outgoingGoodId: id },
+        await tx.outgoingGoodsItem.deleteMany({
+          where: { outgoingGoodsId: id },
         });
 
-        return tx.outgoingGood.update({
+        return tx.outgoingGoods.update({
           where: { id },
           data: {
             ...(destination !== undefined && { destination }),
@@ -111,10 +113,10 @@ module.exports = async function handler(req, res) {
         return jsonError(res, 403, "Forbidden");
       }
 
-      await prisma.outgoingGoodItem.deleteMany({
-        where: { outgoingGoodId: id },
+      await prisma.outgoingGoodsItem.deleteMany({
+        where: { outgoingGoodsId: id },
       });
-      await prisma.outgoingGood.delete({ where: { id } });
+      await prisma.outgoingGoods.delete({ where: { id } });
 
       return res.status(200).json({ message: "Outgoing good deleted successfully" });
     } catch (error) {

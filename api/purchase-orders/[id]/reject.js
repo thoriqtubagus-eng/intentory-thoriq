@@ -1,5 +1,6 @@
-const { prisma } = require("../../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../../_lib/auth");
+const { prisma } = require("../../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../../_lib/auth");
+const { parseBody } = require("../../_lib/utils");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") return jsonError(res, 405, "Method not allowed");
@@ -12,7 +13,8 @@ module.exports = async function handler(req, res) {
     }
 
     const { id } = req.query;
-    const { reason } = req.body;
+    const body = await parseBody(req);
+    const { reason } = body;
 
     if (!reason) return jsonError(res, 400, "Rejection reason is required");
 

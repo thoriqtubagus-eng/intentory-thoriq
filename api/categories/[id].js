@@ -1,5 +1,6 @@
-const { prisma } = require("../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../_lib/auth");
+const { prisma } = require("../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../_lib/auth");
+const { parseBody } = require("../_lib/utils");
 
 module.exports = async function (req, res) {
   try {
@@ -21,7 +22,8 @@ module.exports = async function (req, res) {
       if (!authorize(user, "admin", "warehouse_staff"))
         return jsonError(res, 403, "Forbidden");
 
-      const { name, description } = req.body;
+      const body = await parseBody(req);
+      const { name, description } = body;
       const category = await prisma.category.update({
         where: { id },
         data: { name, description },

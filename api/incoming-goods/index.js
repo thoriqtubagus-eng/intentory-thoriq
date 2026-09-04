@@ -1,5 +1,6 @@
-const { prisma } = require("../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../_lib/auth");
+const { prisma } = require("../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../_lib/auth");
+const { parseBody } = require("../_lib/utils");
 
 function generateTransactionNumber() {
   const now = new Date();
@@ -43,7 +44,8 @@ module.exports = async function handler(req, res) {
         return jsonError(res, 403, "Forbidden");
       }
 
-      const { supplierId, items, notes, receivedAt, referenceNumber } = req.body;
+      const body = await parseBody(req);
+      const { supplierId, items, notes, receivedAt, referenceNumber } = body;
 
       if (!supplierId) return jsonError(res, 400, "supplierId is required");
       if (!items || !Array.isArray(items) || items.length === 0) {

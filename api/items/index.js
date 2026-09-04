@@ -1,5 +1,6 @@
-const { prisma } = require("../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../_lib/auth");
+const { prisma } = require("../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../_lib/auth");
+const { parseBody } = require("../_lib/utils");
 
 function generateSKU(categoryName) {
   const alphaOnly = categoryName.replace(/[^a-zA-Z]/g, "").toUpperCase();
@@ -37,7 +38,8 @@ module.exports = async function handler(req, res) {
         return jsonError(res, 403, "Forbidden");
       }
 
-      const { name, description, categoryId, unit, minStock, stock, location } = req.body;
+      const body = await parseBody(req);
+      const { name, description, categoryId, unit, minStock, stock, location } = body;
 
       if (!name || !categoryId || !unit) {
         return jsonError(res, 400, "name, categoryId, and unit are required");

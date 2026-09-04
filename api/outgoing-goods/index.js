@@ -1,5 +1,6 @@
-const { prisma } = require("../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../_lib/auth");
+const { prisma } = require("../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../_lib/auth");
+const { parseBody } = require("../_lib/utils");
 
 function generateTransactionNumber() {
   const now = new Date();
@@ -18,7 +19,7 @@ module.exports = async function handler(req, res) {
       const user = await authenticate(req);
       if (!user) return jsonError(res, 401, "Unauthorized");
 
-      const outgoingGoods = await prisma.outgoingGood.findMany({
+      const outgoingGoods = await prisma.outgoingGoods.findMany({
         include: {
           approvedBy: true,
           issuedBy: true,
@@ -53,7 +54,8 @@ module.exports = async function handler(req, res) {
         return jsonError(res, 403, "Forbidden");
       }
 
-      const { destination, recipientName, notes, items, issuedById } = req.body;
+      const body = await parseBody(req);
+      const { destination, recipientName, notes, items, issuedById } = body;
 
       if (!destination || !recipientName || !items || !items.length) {
         return jsonError(
@@ -65,7 +67,7 @@ module.exports = async function handler(req, res) {
 
       const transactionNumber = generateTransactionNumber();
 
-      const outgoingGood = await prisma.outgoingGood.create({
+      const outgoingGoods = await prisma.outgoingGoods.create({
         data: {
           transactionNumber,
           destination,
@@ -100,7 +102,7 @@ module.exports = async function handler(req, res) {
         },
       });
 
-      return res.status(201).json(outgoingGood);
+      return res.status(201).json(outgoingGoods);
     } catch (error) {
       return jsonError(res, 500, "Internal server error");
     }

@@ -1,5 +1,6 @@
-const { prisma } = require("../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../_lib/auth");
+const { prisma } = require("../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../_lib/auth");
+const { parseBody } = require("../_lib/utils");
 
 function generateRequestNumber() {
   const now = new Date();
@@ -38,7 +39,8 @@ module.exports = async function handler(req, res) {
       const user = await authenticate(req);
       if (!user) return jsonError(res, 401, "Unauthorized");
 
-      const { items, requestedBy, department, requiredDate, notes } = req.body;
+      const body = await parseBody(req);
+      const { items, requestedBy, department, requiredDate, notes } = body;
 
       if (!items || !Array.isArray(items) || items.length === 0) {
         return jsonError(res, 400, "items array is required and must not be empty");

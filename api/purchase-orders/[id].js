@@ -1,5 +1,6 @@
-const { prisma } = require("../../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../../_lib/auth");
+const { prisma } = require("../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../_lib/auth");
+const { parseBody } = require("../_lib/utils");
 
 module.exports = async function handler(req, res) {
   const { id } = req.query;
@@ -40,7 +41,8 @@ module.exports = async function handler(req, res) {
         return jsonError(res, 400, "Only DRAFT orders can be edited");
       }
 
-      const { supplierId, items, notes, expectedDate } = req.body;
+      const body = await parseBody(req);
+      const { supplierId, items, notes, expectedDate } = body;
 
       if (supplierId) {
         const supplier = await prisma.supplier.findUnique({ where: { id: supplierId } });

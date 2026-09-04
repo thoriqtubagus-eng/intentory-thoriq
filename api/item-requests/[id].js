@@ -1,5 +1,6 @@
-const { prisma } = require("../../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../../_lib/auth");
+const { prisma } = require("../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../_lib/auth");
+const { parseBody } = require("../_lib/utils");
 
 module.exports = async function handler(req, res) {
   const { id } = req.query;
@@ -36,7 +37,8 @@ module.exports = async function handler(req, res) {
         return jsonError(res, 400, "Only DRAFT requests can be edited");
       }
 
-      const { reason, items, requestedBy, department, requiredDate, notes } = req.body;
+      const body = await parseBody(req);
+      const { reason, items, requestedBy, department, requiredDate, notes } = body;
 
       const updated = await prisma.$transaction(async (tx) => {
         if (items && Array.isArray(items)) {

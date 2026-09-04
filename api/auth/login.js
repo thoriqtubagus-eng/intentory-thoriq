@@ -8,10 +8,17 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { username, password } = req.body;
+    let body = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch(e) {
+        return res.status(400).json({ error: 'Parse failed', raw: body.substring(0, 200) });
+      }
+    }
+
+    const { username, password } = body || {};
 
     if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required' });
+      return res.status(400).json({ error: 'Missing username or password', bodyType: typeof body, bodyKeys: body ? Object.keys(body) : null });
     }
 
     const user = await prisma.user.findUnique({ where: { username } });
@@ -37,6 +44,6 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ user: userWithoutPassword, token });
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: error.message, stack: error.stack?.substring(0, 500) });
   }
 };

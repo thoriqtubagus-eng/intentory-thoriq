@@ -1,5 +1,5 @@
-const { prisma } = require("../../../_lib/prisma");
-const { authenticate, authorize, jsonError } = require("../../../_lib/auth");
+const { prisma } = require("../../_lib/prisma");
+const { authenticate, authorize, jsonError } = require("../../_lib/auth");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
