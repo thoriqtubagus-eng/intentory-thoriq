@@ -137,6 +137,8 @@ export const useCreateItem = () => {
       const tempItem: Item = {
         ...newData,
         id: `temp-${Date.now()}`,
+        sku: `TEMP-${Date.now()}`,
+        location: newData.location || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       } as Item;

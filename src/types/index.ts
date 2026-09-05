@@ -28,7 +28,7 @@ export interface Category {
 // Item
 export interface Item {
   currentStock: number;
-  sku: ReactNode;
+  sku: string;
   id: string;
   code: string;
   name: string;
