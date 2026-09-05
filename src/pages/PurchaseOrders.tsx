@@ -196,46 +196,49 @@ const PurchaseOrders: React.FC = () => {
       return;
     }
 
+    const loadingToast = toast.loading(editingOrder ? "Updating order..." : "Creating order...");
     try {
       if (editingOrder) {
         await updateOrder.mutateAsync({
           id: editingOrder.id,
           updates: formData,
         });
-        toast.success("Order updated successfully");
+        toast.success("Order updated successfully", { id: loadingToast });
       } else {
         await createOrder.mutateAsync({
           ...formData,
           orderNumber: undefined,
           createdBy: "",
         });
-        toast.success("Order created successfully");
+        toast.success("Order created successfully", { id: loadingToast });
       }
       setIsDialogOpen(false);
     } catch (error) {
-      toast.error("Failed to save order");
+      toast.error("Failed to save order", { id: loadingToast });
     }
   };
 
   const handleSubmit = async () => {
     if (!submitId) return;
+    const loadingToast = toast.loading("Submitting order...");
     try {
       await submitOrder.mutateAsync(submitId);
-      toast.success("Order submitted for approval");
+      toast.success("Order submitted for approval", { id: loadingToast });
       setSubmitId(null);
     } catch (error) {
-      toast.error("Failed to submit order");
+      toast.error("Failed to submit order", { id: loadingToast });
     }
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    const loadingToast = toast.loading("Deleting order...");
     try {
       await deleteOrder.mutateAsync(deleteId);
-      toast.success("Order deleted successfully");
+      toast.success("Order deleted successfully", { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error("Failed to delete order");
+      toast.error("Failed to delete order", { id: loadingToast });
     }
   };
 
@@ -1036,8 +1039,8 @@ const PurchaseOrders: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button onClick={onSubmit}>
-              {editingOrder ? "Update" : "Create"} as Draft
+            <Button onClick={onSubmit} disabled={editingOrder ? updateOrder.isPending : createOrder.isPending}>
+              {(editingOrder ? updateOrder.isPending : createOrder.isPending) ? "Saving..." : `${editingOrder ? "Update" : "Create"} as Draft`}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1163,7 +1166,9 @@ const PurchaseOrders: React.FC = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSubmit}>Submit</AlertDialogAction>
+            <AlertDialogAction onClick={handleSubmit} disabled={submitOrder.isPending}>
+              {submitOrder.isPending ? "Submitting..." : "Submit"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -1181,9 +1186,10 @@ const PurchaseOrders: React.FC = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
+              disabled={deleteOrder.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {deleteOrder.isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -78,10 +78,11 @@ const Users: React.FC = () => {
       return;
     }
 
+    const loadingToast = toast.loading(editingUser ? 'Updating user...' : 'Creating user...');
     try {
       if (editingUser) {
         await updateUser.mutateAsync({ id: editingUser.id, updates: data });
-        toast.success('User updated successfully');
+        toast.success('User updated successfully', { id: loadingToast });
       } else {
         await createUser.mutateAsync({
           username: data.username,
@@ -90,22 +91,23 @@ const Users: React.FC = () => {
           role: data.role,
           department: data.department,
         });
-        toast.success('User created successfully');
+        toast.success('User created successfully', { id: loadingToast });
       }
       setIsDialogOpen(false);
     } catch (error) {
-      toast.error('Failed to save user');
+      toast.error('Failed to save user', { id: loadingToast });
     }
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    const loadingToast = toast.loading('Deleting user...');
     try {
       await deleteUser.mutateAsync(deleteId);
-      toast.success('User deleted successfully');
+      toast.success('User deleted successfully', { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error('Failed to delete user');
+      toast.error('Failed to delete user', { id: loadingToast });
     }
   };
 
@@ -250,7 +252,9 @@ const Users: React.FC = () => {
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit">{editingUser ? 'Update' : 'Create'}</Button>
+              <Button type="submit" disabled={createUser.isPending || updateUser.isPending}>
+                {createUser.isPending || updateUser.isPending ? 'Saving...' : editingUser ? 'Update' : 'Create'}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -266,8 +270,12 @@ const Users: React.FC = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+            <AlertDialogAction 
+              onClick={handleDelete} 
+              disabled={deleteUser.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteUser.isPending ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

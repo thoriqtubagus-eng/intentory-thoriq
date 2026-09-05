@@ -63,10 +63,11 @@ const Suppliers: React.FC = () => {
   };
 
   const onSubmit = async (data: SupplierFormData) => {
+    const loadingToast = toast.loading(editingSupplier ? "Updating supplier..." : "Creating supplier...");
     try {
       if (editingSupplier) {
         await updateSupplier.mutateAsync({ id: editingSupplier.id, updates: data });
-        toast.success('Supplier updated successfully');
+        toast.success('Supplier updated successfully', { id: loadingToast });
       } else {
         await createSupplier.mutateAsync({
           name: data.name,
@@ -75,22 +76,23 @@ const Suppliers: React.FC = () => {
           email: data.email,
           contactName: data.contactName,
         });
-        toast.success('Supplier created successfully');
+        toast.success('Supplier created successfully', { id: loadingToast });
       }
       setIsDialogOpen(false);
     } catch (error) {
-      toast.error('Failed to save supplier');
+      toast.error('Failed to save supplier', { id: loadingToast });
     }
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    const loadingToast = toast.loading("Deleting supplier...");
     try {
       await deleteSupplier.mutateAsync(deleteId);
-      toast.success('Supplier deleted successfully');
+      toast.success('Supplier deleted successfully', { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error('Failed to delete supplier');
+      toast.error('Failed to delete supplier', { id: loadingToast });
     }
   };
 
@@ -209,7 +211,7 @@ const Suppliers: React.FC = () => {
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit">{editingSupplier ? 'Update' : 'Create'}</Button>
+              <Button type="submit" disabled={createSupplier.isPending || updateSupplier.isPending}>{(createSupplier.isPending || updateSupplier.isPending) ? 'Saving...' : (editingSupplier ? 'Update' : 'Create')}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -225,8 +227,8 @@ const Suppliers: React.FC = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+            <AlertDialogAction onClick={handleDelete} disabled={deleteSupplier.isPending} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleteSupplier.isPending ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

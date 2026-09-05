@@ -55,28 +55,30 @@ const Categories: React.FC = () => {
   };
 
   const onSubmit = async (data: CategoryFormData) => {
+    const loadingToast = toast.loading(editingCategory ? 'Updating category...' : 'Creating category...');
     try {
       if (editingCategory) {
         await updateCategory.mutateAsync({ id: editingCategory.id, updates: data });
-        toast.success('Category updated successfully');
+        toast.success('Category updated successfully', { id: loadingToast });
       } else {
         await createCategory.mutateAsync({ name: data.name, description: data.description });
-        toast.success('Category created successfully');
+        toast.success('Category created successfully', { id: loadingToast });
       }
       setIsDialogOpen(false);
     } catch (error) {
-      toast.error('Failed to save category');
+      toast.error('Failed to save category', { id: loadingToast });
     }
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    const loadingToast = toast.loading('Deleting category...');
     try {
       await deleteCategory.mutateAsync(deleteId);
-      toast.success('Category deleted successfully');
+      toast.success('Category deleted successfully', { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error('Failed to delete category');
+      toast.error('Failed to delete category', { id: loadingToast });
     }
   };
 
@@ -167,7 +169,9 @@ const Categories: React.FC = () => {
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit">{editingCategory ? 'Update' : 'Create'}</Button>
+              <Button type="submit" disabled={createCategory.isPending || updateCategory.isPending}>
+                {createCategory.isPending || updateCategory.isPending ? 'Saving...' : editingCategory ? 'Update' : 'Create'}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -183,8 +187,8 @@ const Categories: React.FC = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+            <AlertDialogAction onClick={handleDelete} disabled={deleteCategory.isPending} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleteCategory.isPending ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

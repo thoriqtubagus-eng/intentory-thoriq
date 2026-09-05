@@ -158,12 +158,13 @@ const OutgoingGoods: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!submitId) return;
+    const loadingToast = toast.loading("Submitting transaction...");
     try {
       await submitTransaction.mutateAsync(submitId);
-      toast.success("Transaction submitted for approval");
+      toast.success("Transaction submitted for approval", { id: loadingToast });
       setSubmitId(null);
     } catch (error) {
-      toast.error("Failed to submit transaction");
+      toast.error("Failed to submit transaction", { id: loadingToast });
     }
   };
   const resetForm = () => {
@@ -233,6 +234,7 @@ const OutgoingGoods: React.FC = () => {
     }
 
     try {
+      const loadingToast = toast.loading(editingTransaction ? "Updating transaction..." : "Creating transaction...");
       if (editingTransaction) {
         await updateTransaction.mutateAsync({
           id: editingTransaction.id,
@@ -243,7 +245,7 @@ const OutgoingGoods: React.FC = () => {
             items: formData.items,
           },
         });
-        toast.success("Transaction updated successfully");
+        toast.success("Transaction updated successfully", { id: loadingToast });
       } else {
         await createTransaction.mutateAsync({
           destination: formData.destination,
@@ -252,23 +254,25 @@ const OutgoingGoods: React.FC = () => {
           items: formData.items,
           issuedById: user?.id || "", // Use issuedById instead of createdBy
         });
-        toast.success("Transaction created successfully");
+        toast.success("Transaction created successfully", { id: loadingToast });
       }
       setIsDialogOpen(false);
     } catch (error: any) {
-      toast.error(error.response?.data?.error || "Failed to save transaction");
+      toast.error(error.response?.data?.error || "Failed to save transaction", { id: loadingToast });
     }
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    const loadingToast = toast.loading("Deleting transaction...");
     try {
       await deleteTransaction.mutateAsync(deleteId);
-      toast.success("Transaction deleted successfully");
+      toast.success("Transaction deleted successfully", { id: loadingToast });
       setDeleteId(null);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.error || "Failed to delete transaction"
+        error.response?.data?.error || "Failed to delete transaction",
+        { id: loadingToast }
       );
     }
   };
@@ -1044,8 +1048,12 @@ const OutgoingGoods: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button onClick={onSubmit}>
-              {editingTransaction ? "Update" : "Create"}
+            <Button onClick={onSubmit} disabled={createTransaction.isPending || updateTransaction.isPending}>
+              {createTransaction.isPending || updateTransaction.isPending
+                ? "Saving..."
+                : editingTransaction
+                  ? "Update"
+                  : "Create"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1170,8 +1178,9 @@ const OutgoingGoods: React.FC = () => {
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteTransaction.isPending}
             >
-              Delete
+              {deleteTransaction.isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1189,7 +1198,9 @@ const OutgoingGoods: React.FC = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSubmit}>Submit</AlertDialogAction>
+            <AlertDialogAction onClick={handleSubmit} disabled={submitTransaction.isPending}>
+              {submitTransaction.isPending ? "Submitting..." : "Submit"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

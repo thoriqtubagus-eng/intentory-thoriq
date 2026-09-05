@@ -48,7 +48,17 @@ export const useCreateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => userApi.create(data),
-    onSuccess: () => {
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.users });
+      const previous = queryClient.getQueryData(queryKeys.users);
+      const tempItem = { ...newData, id: `temp-${Date.now()}`, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as User;
+      queryClient.setQueryData(queryKeys.users, (old: User[]) => [...old, tempItem]);
+      return { previous };
+    },
+    onError: (_err, _newData, context) => {
+      queryClient.setQueryData(queryKeys.users, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users });
     },
   });
@@ -58,7 +68,18 @@ export const useUpdateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<User> }) => userApi.update(id, updates),
-    onSuccess: () => {
+    onMutate: async ({ id, updates }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.users });
+      const previous = queryClient.getQueryData(queryKeys.users);
+      queryClient.setQueryData(queryKeys.users, (old: User[]) =>
+        old.map((u) => (u.id === id ? { ...u, ...updates } : u))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.users, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users });
     },
   });
@@ -68,7 +89,18 @@ export const useDeleteUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => userApi.delete(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.users });
+      const previous = queryClient.getQueryData(queryKeys.users);
+      queryClient.setQueryData(queryKeys.users, (old: User[]) =>
+        old.filter((u) => u.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.users, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users });
     },
   });
@@ -86,7 +118,17 @@ export const useCreateCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => categoryApi.create(data),
-    onSuccess: () => {
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.categories });
+      const previous = queryClient.getQueryData(queryKeys.categories);
+      const tempItem = { ...newData, id: `temp-${Date.now()}`, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as Category;
+      queryClient.setQueryData(queryKeys.categories, (old: Category[]) => [...old, tempItem]);
+      return { previous };
+    },
+    onError: (_err, _newData, context) => {
+      queryClient.setQueryData(queryKeys.categories, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.categories });
     },
   });
@@ -96,7 +138,18 @@ export const useUpdateCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Category> }) => categoryApi.update(id, updates),
-    onSuccess: () => {
+    onMutate: async ({ id, updates }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.categories });
+      const previous = queryClient.getQueryData(queryKeys.categories);
+      queryClient.setQueryData(queryKeys.categories, (old: Category[]) =>
+        old.map((c) => (c.id === id ? { ...c, ...updates } : c))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.categories, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.categories });
     },
   });
@@ -106,7 +159,18 @@ export const useDeleteCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => categoryApi.delete(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.categories });
+      const previous = queryClient.getQueryData(queryKeys.categories);
+      queryClient.setQueryData(queryKeys.categories, (old: Category[]) =>
+        old.filter((c) => c.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.categories, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.categories });
     },
   });
@@ -208,7 +272,17 @@ export const useCreateSupplier = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>) => supplierApi.create(data),
-    onSuccess: () => {
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.suppliers });
+      const previous = queryClient.getQueryData(queryKeys.suppliers);
+      const tempItem = { ...newData, id: `temp-${Date.now()}`, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as Supplier;
+      queryClient.setQueryData(queryKeys.suppliers, (old: Supplier[]) => [...old, tempItem]);
+      return { previous };
+    },
+    onError: (_err, _newData, context) => {
+      queryClient.setQueryData(queryKeys.suppliers, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.suppliers });
     },
   });
@@ -218,7 +292,18 @@ export const useUpdateSupplier = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Supplier> }) => supplierApi.update(id, updates),
-    onSuccess: () => {
+    onMutate: async ({ id, updates }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.suppliers });
+      const previous = queryClient.getQueryData(queryKeys.suppliers);
+      queryClient.setQueryData(queryKeys.suppliers, (old: Supplier[]) =>
+        old.map((s) => (s.id === id ? { ...s, ...updates } : s))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.suppliers, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.suppliers });
     },
   });
@@ -228,7 +313,18 @@ export const useDeleteSupplier = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => supplierApi.delete(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.suppliers });
+      const previous = queryClient.getQueryData(queryKeys.suppliers);
+      queryClient.setQueryData(queryKeys.suppliers, (old: Supplier[]) =>
+        old.filter((s) => s.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.suppliers, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.suppliers });
     },
   });
@@ -247,7 +343,17 @@ export const useCreateIncomingGoods = () => {
   return useMutation({
     mutationFn: (data: Omit<IncomingGoods, 'id' | 'transactionNumber' | 'status' | 'createdAt' | 'updatedAt'>) =>
       incomingGoodsApi.create(data),
-    onSuccess: () => {
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.incomingGoods });
+      const previous = queryClient.getQueryData(queryKeys.incomingGoods);
+      const tempItem = { ...newData, id: `temp-${Date.now()}`, transactionNumber: `TEMP-${Date.now()}`, status: 'DRAFT' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as IncomingGoods;
+      queryClient.setQueryData(queryKeys.incomingGoods, (old: IncomingGoods[]) => [...old, tempItem]);
+      return { previous };
+    },
+    onError: (_err, _newData, context) => {
+      queryClient.setQueryData(queryKeys.incomingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.incomingGoods });
     },
   });
@@ -258,7 +364,18 @@ export const useUpdateIncomingGoods = () => {
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<IncomingGoods> }) =>
       incomingGoodsApi.update(id, updates),
-    onSuccess: () => {
+    onMutate: async ({ id, updates }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.incomingGoods });
+      const previous = queryClient.getQueryData(queryKeys.incomingGoods);
+      queryClient.setQueryData(queryKeys.incomingGoods, (old: IncomingGoods[]) =>
+        old.map((t) => (t.id === id ? { ...t, ...updates } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.incomingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.incomingGoods });
     },
   });
@@ -268,7 +385,18 @@ export const useSubmitIncomingGoods = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => incomingGoodsApi.submit(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.incomingGoods });
+      const previous = queryClient.getQueryData(queryKeys.incomingGoods);
+      queryClient.setQueryData(queryKeys.incomingGoods, (old: IncomingGoods[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'WAITING_APPROVAL' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.incomingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.incomingGoods });
     },
   });
@@ -279,7 +407,18 @@ export const useApproveIncomingGoods = () => {
   return useMutation({
     mutationFn: ({ id, userId, signature , items, status}: { id: string; userId: string; signature: string, items: any, status: any }) =>
       incomingGoodsApi.approve(id, userId, signature, items, status),
-    onSuccess: () => {
+    onMutate: async ({ id }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.incomingGoods });
+      const previous = queryClient.getQueryData(queryKeys.incomingGoods);
+      queryClient.setQueryData(queryKeys.incomingGoods, (old: IncomingGoods[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'APPROVED' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.incomingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.incomingGoods });
       queryClient.invalidateQueries({ queryKey: queryKeys.items });
       queryClient.invalidateQueries({ queryKey: queryKeys.stockMovements });
@@ -293,7 +432,18 @@ export const useRejectIncomingGoods = () => {
   return useMutation({
     mutationFn: ({ id, userId, reason, status }: { id: string; userId: string; reason: string, status:string }) =>
       incomingGoodsApi.reject(id, userId, reason, status),
-    onSuccess: () => {
+    onMutate: async ({ id }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.incomingGoods });
+      const previous = queryClient.getQueryData(queryKeys.incomingGoods);
+      queryClient.setQueryData(queryKeys.incomingGoods, (old: IncomingGoods[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'REJECTED' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.incomingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.incomingGoods });
     },
   });
@@ -303,7 +453,18 @@ export const useDeleteIncomingGoods = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => incomingGoodsApi.delete(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.incomingGoods });
+      const previous = queryClient.getQueryData(queryKeys.incomingGoods);
+      queryClient.setQueryData(queryKeys.incomingGoods, (old: IncomingGoods[]) =>
+        old.filter((t) => t.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.incomingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.incomingGoods });
     },
   });
@@ -322,7 +483,17 @@ export const useCreateOutgoingGoods = () => {
   return useMutation({
     mutationFn: (data: Omit<OutgoingGoods, 'id' | 'transactionNumber' | 'status' | 'createdAt' | 'updatedAt'>) =>
       outgoingGoodsApi.create(data),
-    onSuccess: () => {
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.outgoingGoods });
+      const previous = queryClient.getQueryData(queryKeys.outgoingGoods);
+      const tempItem = { ...newData, id: `temp-${Date.now()}`, transactionNumber: `TEMP-${Date.now()}`, status: 'DRAFT' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as OutgoingGoods;
+      queryClient.setQueryData(queryKeys.outgoingGoods, (old: OutgoingGoods[]) => [...old, tempItem]);
+      return { previous };
+    },
+    onError: (_err, _newData, context) => {
+      queryClient.setQueryData(queryKeys.outgoingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.outgoingGoods });
     },
   });
@@ -333,7 +504,18 @@ export const useUpdateOutgoingGoods = () => {
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<OutgoingGoods> }) =>
       outgoingGoodsApi.update(id, updates),
-    onSuccess: () => {
+    onMutate: async ({ id, updates }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.outgoingGoods });
+      const previous = queryClient.getQueryData(queryKeys.outgoingGoods);
+      queryClient.setQueryData(queryKeys.outgoingGoods, (old: OutgoingGoods[]) =>
+        old.map((t) => (t.id === id ? { ...t, ...updates } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.outgoingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.outgoingGoods });
     },
   });
@@ -343,7 +525,18 @@ export const useSubmitOutgoingGoods = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => outgoingGoodsApi.submit(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.outgoingGoods });
+      const previous = queryClient.getQueryData(queryKeys.outgoingGoods);
+      queryClient.setQueryData(queryKeys.outgoingGoods, (old: OutgoingGoods[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'WAITING_APPROVAL' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.outgoingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.outgoingGoods });
     },
   });
@@ -354,7 +547,18 @@ export const useApproveOutgoingGoods = () => {
   return useMutation({
     mutationFn: ({ id, userId, signature, status, items }: { id: string; userId: string; signature: string, status: any, items: any }) =>
       outgoingGoodsApi.approve(id, userId, signature, status, items),
-    onSuccess: () => {
+    onMutate: async ({ id }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.outgoingGoods });
+      const previous = queryClient.getQueryData(queryKeys.outgoingGoods);
+      queryClient.setQueryData(queryKeys.outgoingGoods, (old: OutgoingGoods[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'APPROVED' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.outgoingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.outgoingGoods });
       queryClient.invalidateQueries({ queryKey: queryKeys.items });
       queryClient.invalidateQueries({ queryKey: queryKeys.stockMovements });
@@ -368,7 +572,18 @@ export const useRejectOutgoingGoods = () => {
   return useMutation({
     mutationFn: ({ id, userId, reason, status }: { id: string; userId: string; reason: string, status: string }) =>
       outgoingGoodsApi.reject(id, userId, reason, status),
-    onSuccess: () => {
+    onMutate: async ({ id }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.outgoingGoods });
+      const previous = queryClient.getQueryData(queryKeys.outgoingGoods);
+      queryClient.setQueryData(queryKeys.outgoingGoods, (old: OutgoingGoods[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'REJECTED' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.outgoingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.outgoingGoods });
     },
   });
@@ -378,7 +593,18 @@ export const useDeleteOutgoingGoods = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => outgoingGoodsApi.delete(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.outgoingGoods });
+      const previous = queryClient.getQueryData(queryKeys.outgoingGoods);
+      queryClient.setQueryData(queryKeys.outgoingGoods, (old: OutgoingGoods[]) =>
+        old.filter((t) => t.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.outgoingGoods, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.outgoingGoods });
     },
   });
@@ -397,7 +623,17 @@ export const useCreateItemRequest = () => {
   return useMutation({
     mutationFn: (data: Omit<ItemRequest, 'id' | 'transactionNumber' | 'status' | 'createdAt' | 'updatedAt'>) =>
       itemRequestApi.create(data),
-    onSuccess: () => {
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.itemRequests });
+      const previous = queryClient.getQueryData(queryKeys.itemRequests);
+      const tempItem = { ...newData, id: `temp-${Date.now()}`, requestNumber: `TEMP-${Date.now()}`, status: 'DRAFT' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as ItemRequest;
+      queryClient.setQueryData(queryKeys.itemRequests, (old: ItemRequest[]) => [...old, tempItem]);
+      return { previous };
+    },
+    onError: (_err, _newData, context) => {
+      queryClient.setQueryData(queryKeys.itemRequests, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.itemRequests });
     },
   });
@@ -408,7 +644,18 @@ export const useUpdateItemRequest = () => {
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<ItemRequest> }) =>
       itemRequestApi.update(id, updates),
-    onSuccess: () => {
+    onMutate: async ({ id, updates }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.itemRequests });
+      const previous = queryClient.getQueryData(queryKeys.itemRequests);
+      queryClient.setQueryData(queryKeys.itemRequests, (old: ItemRequest[]) =>
+        old.map((t) => (t.id === id ? { ...t, ...updates } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.itemRequests, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.itemRequests });
     },
   });
@@ -418,7 +665,18 @@ export const useSubmitItemRequest = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => itemRequestApi.submit(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.itemRequests });
+      const previous = queryClient.getQueryData(queryKeys.itemRequests);
+      queryClient.setQueryData(queryKeys.itemRequests, (old: ItemRequest[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'WAITING_APPROVAL' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.itemRequests, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.itemRequests });
     },
   });
@@ -429,7 +687,18 @@ export const useApproveItemRequest = () => {
   return useMutation({
     mutationFn: ({ id, userId, signature, status, items }: { id: string; userId: string; signature: string, status: string, items: any }) =>
       itemRequestApi.approve(id, userId, signature, status, items),
-    onSuccess: () => {
+    onMutate: async ({ id }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.itemRequests });
+      const previous = queryClient.getQueryData(queryKeys.itemRequests);
+      queryClient.setQueryData(queryKeys.itemRequests, (old: ItemRequest[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'APPROVED' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.itemRequests, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.itemRequests });
       queryClient.invalidateQueries({ queryKey: queryKeys.items });
       queryClient.invalidateQueries({ queryKey: queryKeys.stockMovements });
@@ -443,7 +712,18 @@ export const useRejectItemRequest = () => {
   return useMutation({
     mutationFn: ({ id, userId, reason, status }: { id: string; userId: string; reason: string, status: string }) =>
       itemRequestApi.reject(id, userId, reason, status),
-    onSuccess: () => {
+    onMutate: async ({ id }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.itemRequests });
+      const previous = queryClient.getQueryData(queryKeys.itemRequests);
+      queryClient.setQueryData(queryKeys.itemRequests, (old: ItemRequest[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'REJECTED' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.itemRequests, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.itemRequests });
     },
   });
@@ -453,7 +733,18 @@ export const useDeleteItemRequest = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => itemRequestApi.delete(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.itemRequests });
+      const previous = queryClient.getQueryData(queryKeys.itemRequests);
+      queryClient.setQueryData(queryKeys.itemRequests, (old: ItemRequest[]) =>
+        old.filter((t) => t.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.itemRequests, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.itemRequests });
     },
   });
@@ -472,7 +763,17 @@ export const useCreatePurchaseOrder = () => {
   return useMutation({
     mutationFn: (data: Omit<PurchaseOrder, 'id' | 'transactionNumber' | 'status' | 'createdAt' | 'updatedAt'>) =>
       purchaseOrderApi.create(data),
-    onSuccess: () => {
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.purchaseOrders });
+      const previous = queryClient.getQueryData(queryKeys.purchaseOrders);
+      const tempItem = { ...newData, id: `temp-${Date.now()}`, orderNumber: `TEMP-${Date.now()}`, status: 'DRAFT' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as PurchaseOrder;
+      queryClient.setQueryData(queryKeys.purchaseOrders, (old: PurchaseOrder[]) => [...old, tempItem]);
+      return { previous };
+    },
+    onError: (_err, _newData, context) => {
+      queryClient.setQueryData(queryKeys.purchaseOrders, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.purchaseOrders });
     },
   });
@@ -483,7 +784,18 @@ export const useUpdatePurchaseOrder = () => {
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<PurchaseOrder> }) =>
       purchaseOrderApi.update(id, updates),
-    onSuccess: () => {
+    onMutate: async ({ id, updates }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.purchaseOrders });
+      const previous = queryClient.getQueryData(queryKeys.purchaseOrders);
+      queryClient.setQueryData(queryKeys.purchaseOrders, (old: PurchaseOrder[]) =>
+        old.map((t) => (t.id === id ? { ...t, ...updates } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.purchaseOrders, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.purchaseOrders });
     },
   });
@@ -493,7 +805,18 @@ export const useSubmitPurchaseOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => purchaseOrderApi.submit(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.purchaseOrders });
+      const previous = queryClient.getQueryData(queryKeys.purchaseOrders);
+      queryClient.setQueryData(queryKeys.purchaseOrders, (old: PurchaseOrder[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'WAITING_APPROVAL' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.purchaseOrders, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.purchaseOrders });
     },
   });
@@ -504,7 +827,18 @@ export const useApprovePurchaseOrder = () => {
   return useMutation({
     mutationFn: ({ id, userId, signature, status, items }: { id: string; userId: string; signature: string, status: string, items:any }) =>
       purchaseOrderApi.approve(id, userId, signature, status, items),
-    onSuccess: () => {
+    onMutate: async ({ id }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.purchaseOrders });
+      const previous = queryClient.getQueryData(queryKeys.purchaseOrders);
+      queryClient.setQueryData(queryKeys.purchaseOrders, (old: PurchaseOrder[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'APPROVED' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.purchaseOrders, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.purchaseOrders });
       queryClient.invalidateQueries({ queryKey: queryKeys.items });
       queryClient.invalidateQueries({ queryKey: queryKeys.stockMovements });
@@ -518,7 +852,18 @@ export const useRejectPurchaseOrder = () => {
   return useMutation({
     mutationFn: ({ id, userId, reason, status }: { id: string; userId: string; reason: string, status }) =>
       purchaseOrderApi.reject(id, userId, reason, status),
-    onSuccess: () => {
+    onMutate: async ({ id }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.purchaseOrders });
+      const previous = queryClient.getQueryData(queryKeys.purchaseOrders);
+      queryClient.setQueryData(queryKeys.purchaseOrders, (old: PurchaseOrder[]) =>
+        old.map((t) => (t.id === id ? { ...t, status: 'REJECTED' as const } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.purchaseOrders, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.purchaseOrders });
     },
   });
@@ -528,7 +873,18 @@ export const useDeletePurchaseOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => purchaseOrderApi.delete(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.purchaseOrders });
+      const previous = queryClient.getQueryData(queryKeys.purchaseOrders);
+      queryClient.setQueryData(queryKeys.purchaseOrders, (old: PurchaseOrder[]) =>
+        old.filter((t) => t.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.purchaseOrders, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.purchaseOrders });
     },
   });

@@ -233,44 +233,47 @@ const IncomingGoods: React.FC = () => {
     }
 
     try {
+      const loadingToast = toast.loading(editingTransaction ? "Updating transaction..." : "Creating transaction...");
       if (editingTransaction) {
         await updateTransaction.mutateAsync({
           id: editingTransaction.id,
           updates: formData,
         });
-        toast.success("Transaction updated successfully");
+        toast.success("Transaction updated successfully", { id: loadingToast });
       } else {
         await createTransaction.mutateAsync({
           ...formData,
           createdBy: user?.id || "",
         });
-        toast.success("Transaction created successfully");
+        toast.success("Transaction created successfully", { id: loadingToast });
       }
       setIsDialogOpen(false);
     } catch (error) {
-      toast.error("Failed to save transaction");
+      toast.error("Failed to save transaction", { id: loadingToast });
     }
   };
 
   const handleSubmit = async () => {
     if (!submitId) return;
     try {
+      const loadingToast = toast.loading("Submitting transaction...");
       await submitTransaction.mutateAsync(submitId);
-      toast.success("Transaction submitted for approval");
+      toast.success("Transaction submitted for approval", { id: loadingToast });
       setSubmitId(null);
     } catch (error) {
-      toast.error("Failed to submit transaction");
+      toast.error("Failed to submit transaction", { id: loadingToast });
     }
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
+      const loadingToast = toast.loading("Deleting transaction...");
       await deleteTransaction.mutateAsync(deleteId);
-      toast.success("Transaction deleted successfully");
+      toast.success("Transaction deleted successfully", { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error("Failed to delete transaction");
+      toast.error("Failed to delete transaction", { id: loadingToast });
     }
   };
 
@@ -1068,8 +1071,10 @@ const IncomingGoods: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button onClick={onSubmit}>
-              {editingTransaction ? "Update" : "Create"} as Draft
+            <Button onClick={onSubmit} disabled={createTransaction.isPending || updateTransaction.isPending}>
+              {createTransaction.isPending || updateTransaction.isPending
+                ? "Saving..."
+                : `${editingTransaction ? "Update" : "Create"} as Draft`}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1222,7 +1227,9 @@ const IncomingGoods: React.FC = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSubmit}>Submit</AlertDialogAction>
+            <AlertDialogAction onClick={handleSubmit} disabled={submitTransaction.isPending}>
+              {submitTransaction.isPending ? "Submitting..." : "Submit"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -1241,9 +1248,10 @@ const IncomingGoods: React.FC = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
+              disabled={deleteTransaction.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {deleteTransaction.isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

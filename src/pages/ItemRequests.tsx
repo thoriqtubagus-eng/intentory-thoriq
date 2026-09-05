@@ -180,46 +180,49 @@ const ItemRequests: React.FC = () => {
 
     console.log("form dataa" , { ...formData });
 
+    const loadingToast = toast.loading(editingRequest ? "Updating request..." : "Creating request...");
     try {
       if (editingRequest) {
         await updateRequest.mutateAsync({
           id: editingRequest.id,
           updates: formData,
         });
-        toast.success("Request updated successfully");
+        toast.success("Request updated successfully", { id: loadingToast });
       } else {
         await createRequest.mutateAsync({
           ...formData,
           createdBy: user?.id || "",
           requestNumber: undefined,
         });
-        toast.success("Request created successfully");
+        toast.success("Request created successfully", { id: loadingToast });
       }
       setIsDialogOpen(false);
     } catch (error) {
-      toast.error("Failed to save request");
+      toast.error("Failed to save request", { id: loadingToast });
     }
   };
 
   const handleSubmit = async () => {
     if (!submitId) return;
+    const loadingToast = toast.loading("Submitting request...");
     try {
       await submitRequest.mutateAsync(submitId);
-      toast.success("Request submitted for approval");
+      toast.success("Request submitted for approval", { id: loadingToast });
       setSubmitId(null);
     } catch (error) {
-      toast.error("Failed to submit request");
+      toast.error("Failed to submit request", { id: loadingToast });
     }
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    const loadingToast = toast.loading("Deleting request...");
     try {
       await deleteRequest.mutateAsync(deleteId);
-      toast.success("Request deleted successfully");
+      toast.success("Request deleted successfully", { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error("Failed to delete request");
+      toast.error("Failed to delete request", { id: loadingToast });
     }
   };
 
@@ -465,8 +468,8 @@ const ItemRequests: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button onClick={onSubmit}>
-              {editingRequest ? "Update" : "Create"} as Draft
+            <Button onClick={onSubmit} disabled={createRequest.isPending || updateRequest.isPending}>
+              {createRequest.isPending || updateRequest.isPending ? "Saving..." : editingRequest ? "Update" : "Create"} as Draft
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -595,7 +598,9 @@ const ItemRequests: React.FC = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSubmit}>Submit</AlertDialogAction>
+            <AlertDialogAction onClick={handleSubmit} disabled={submitRequest.isPending}>
+              {submitRequest.isPending ? "Submitting..." : "Submit"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -613,9 +618,10 @@ const ItemRequests: React.FC = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
+              disabled={deleteRequest.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {deleteRequest.isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
