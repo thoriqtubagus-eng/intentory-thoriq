@@ -131,7 +131,22 @@ export const useCreateItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: Omit<Item, 'id' | 'createdAt' | 'updatedAt'>) => itemApi.create(data),
-    onSuccess: () => {
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.items });
+      const previous = queryClient.getQueryData(queryKeys.items);
+      const tempItem: Item = {
+        ...newData,
+        id: `temp-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      } as Item;
+      queryClient.setQueryData(queryKeys.items, (old: Item[]) => [...old, tempItem]);
+      return { previous };
+    },
+    onError: (_err, _newData, context) => {
+      queryClient.setQueryData(queryKeys.items, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.items });
     },
   });
@@ -141,7 +156,18 @@ export const useUpdateItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Item> }) => itemApi.update(id, updates),
-    onSuccess: () => {
+    onMutate: async ({ id, updates }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.items });
+      const previous = queryClient.getQueryData(queryKeys.items);
+      queryClient.setQueryData(queryKeys.items, (old: Item[]) =>
+        old.map((item) => (item.id === id ? { ...item, ...updates } : item))
+      );
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      queryClient.setQueryData(queryKeys.items, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.items });
     },
   });
@@ -151,7 +177,18 @@ export const useDeleteItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => itemApi.delete(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.items });
+      const previous = queryClient.getQueryData(queryKeys.items);
+      queryClient.setQueryData(queryKeys.items, (old: Item[]) =>
+        old.filter((item) => item.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(queryKeys.items, context?.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.items });
     },
   });
