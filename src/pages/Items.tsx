@@ -150,10 +150,11 @@ const Items: React.FC = () => {
   };
 
   const onSubmit = async (data: ItemFormData) => {
+    const loadingToast = toast.loading(editingItem ? "Updating item..." : "Creating item...");
     try {
       if (editingItem) {
         await updateItem.mutateAsync({ id: editingItem.id, updates: data });
-        toast.success("Item updated successfully");
+        toast.success("Item updated successfully", { id: loadingToast });
       } else {
         await createItem.mutateAsync({
           code: data.code,
@@ -165,22 +166,23 @@ const Items: React.FC = () => {
           location: data.location,
           description: data.description,
         });
-        toast.success("Item created successfully");
+        toast.success("Item created successfully", { id: loadingToast });
       }
       setIsDialogOpen(false);
     } catch (error) {
-      toast.error("Failed to save item");
+      toast.error("Failed to save item", { id: loadingToast });
     }
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    const loadingToast = toast.loading("Deleting item...");
     try {
       await deleteItem.mutateAsync(deleteId);
-      toast.success("Item deleted successfully");
+      toast.success("Item deleted successfully", { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error("Failed to delete item");
+      toast.error("Failed to delete item", { id: loadingToast });
     }
   };
 
@@ -330,6 +332,7 @@ const Items: React.FC = () => {
                               variant="ghost"
                               size="icon"
                               onClick={() => setDeleteId(item.id)}
+                              disabled={deleteItem.isPending}
                             >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
@@ -459,7 +462,13 @@ const Items: React.FC = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit">{editingItem ? "Update" : "Create"}</Button>
+              <Button type="submit" disabled={createItem.isPending || updateItem.isPending}>
+                {createItem.isPending || updateItem.isPending
+                  ? "Saving..."
+                  : editingItem
+                  ? "Update"
+                  : "Create"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -479,9 +488,10 @@ const Items: React.FC = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
+              disabled={deleteItem.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {deleteItem.isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
