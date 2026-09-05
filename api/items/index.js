@@ -68,7 +68,7 @@ module.exports = async function handler(req, res) {
           categoryId,
           unit,
           minStock: minStock ?? 0,
-          stock: stock ?? 0,
+          currentStock: stock ?? 0,
           location: location || null,
         },
         include: { category: true },

@@ -55,12 +55,19 @@ module.exports = async function handler(req, res) {
           data: { currentStock: { decrement: item.quantity } },
         });
 
+        const itemBefore = await tx.item.findUnique({ where: { id: item.itemId } });
+        const previousStock = itemBefore.currentStock;
+        const newStock = previousStock - item.quantity;
+
         await tx.stockMovement.create({
           data: {
             itemId: item.itemId,
             type: "out",
             quantity: item.quantity,
+            previousStock,
+            newStock,
             reference: outgoing.transactionNumber,
+            performedById: user.id,
             notes: `Outgoing goods approved - ${outgoing.transactionNumber}`,
           },
         });

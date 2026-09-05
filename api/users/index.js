@@ -27,10 +27,10 @@ module.exports = async function handler(req, res) {
       if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
 
       const body = await parseBody(req);
-      const { username, password, role } = body;
+      const { username, password, name, role } = body;
 
-      if (!username || !password) {
-        return jsonError(res, 400, "Username and password are required");
+      if (!username || !password || !name) {
+        return jsonError(res, 400, "Username, password, and name are required");
       }
 
       const existing = await prisma.user.findUnique({
@@ -44,7 +44,8 @@ module.exports = async function handler(req, res) {
         data: {
           username,
           password: hashedPassword,
-          role: role || "user",
+          name,
+          role: role || "warehouse_staff",
         },
         select: {
           id: true,

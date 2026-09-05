@@ -71,7 +71,6 @@ module.exports = async function handler(req, res) {
                 create: items.map((item) => ({
                   itemId: item.itemId,
                   quantity: item.quantity,
-                  notes: item.notes || null,
                 })),
               },
             }),

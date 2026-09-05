@@ -61,7 +61,7 @@ module.exports = async function handler(req, res) {
           ...(categoryId !== undefined && { categoryId }),
           ...(unit !== undefined && { unit }),
           ...(minStock !== undefined && { minStock }),
-          ...(stock !== undefined && { stock }),
+          ...(stock !== undefined && { currentStock: stock }),
           ...(location !== undefined && { location }),
         },
         include: { category: true },
