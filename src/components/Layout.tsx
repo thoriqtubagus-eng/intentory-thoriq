@@ -157,7 +157,7 @@ const Layout: React.FC = () => {
           <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
             <Warehouse className="h-6 w-6 text-sidebar-primary" />
             <span className="ml-3 font-semibold text-sidebar-foreground">
-              Inventory System
+              JPB Inventory
             </span>
           </div>
 

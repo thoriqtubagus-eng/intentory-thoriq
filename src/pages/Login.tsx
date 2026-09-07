@@ -50,7 +50,7 @@ const Login: React.FC = () => {
             <img src={logo} alt="Logo" className="w-full h-full" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
-            PT Samudra Marine Indonesia
+            PT. JAYA PERKASA BOJONEGARA
           </h1>
           <p className="text-muted-foreground mt-1">
             Sistem Monitoring Persediaan Barang
