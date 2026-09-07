@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Package2, Warehouse } from "lucide-react";
-import logo from "../../public/logo.png";
+import logo from "../../public/logo.svg";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -45,9 +45,8 @@ const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-56 h-56 rounded-full bg-primary mb-4">
-            {/* <Warehouse className="w-8 h-8 text-primary" /> */}
-            <img src={logo} alt="Logo" className="w-full h-full" />
+          <div className="inline-flex items-center justify-center w-48 h-48 mb-4">
+            <img src={logo} alt="Logo JPB" className="w-full h-full" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
             PT. JAYA PERKASA BOJONEGARA
