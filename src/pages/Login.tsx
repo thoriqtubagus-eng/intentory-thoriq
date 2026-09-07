@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Package2, Warehouse } from "lucide-react";
-import logo from "../../public/logo.svg";
+import logo from "../../public/logo.png";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
