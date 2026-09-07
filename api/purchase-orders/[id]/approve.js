@@ -80,7 +80,7 @@ module.exports = async function handler(req, res) {
           approvedBy: true,
         },
       });
-    });
+    }, { timeout: 15000 });
 
     return res.status(200).json(updated);
   } catch (error) {

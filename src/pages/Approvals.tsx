@@ -113,11 +113,11 @@ const Approvals: React.FC = () => {
   };
 
   const handleApprove = async () => {
-    console.log("//././",rejectedItems)
     if (!signature) {
       toast.error("Please provide your signature");
       return;
     }
+    const loadingToast = toast.loading("Approving transaction...");
     try {
       const params = {
         id: selectedTransaction.id,
@@ -127,8 +127,6 @@ const Approvals: React.FC = () => {
         status: "APPROVED",
       };
 
-
-      console.log(params)
       if (transactionType === "incoming")
         await approveIncoming.mutateAsync(params);
       else if (transactionType === "outgoing")
@@ -137,10 +135,10 @@ const Approvals: React.FC = () => {
         await approveRequest.mutateAsync(params);
       else if (transactionType === "purchase")
         await approvePO.mutateAsync(params);
-      toast.success("Transaction approved successfully");
+      toast.success("Transaction approved successfully", { id: loadingToast });
       setIsApproveDialogOpen(false);
     } catch (error) {
-      toast.error("Failed to approve transaction");
+      toast.error("Failed to approve transaction", { id: loadingToast });
     }
   };
 
@@ -149,6 +147,7 @@ const Approvals: React.FC = () => {
       toast.error("Please provide a rejection reason");
       return;
     }
+    const loadingToast = toast.loading("Rejecting transaction...");
     try {
       const params = {
         id: selectedTransaction.id,
@@ -164,10 +163,10 @@ const Approvals: React.FC = () => {
         await rejectRequest.mutateAsync(params);
       else if (transactionType === "purchase")
         await rejectPO.mutateAsync(params);
-      toast.success("Transaction rejected");
+      toast.success("Transaction rejected", { id: loadingToast });
       setIsRejectDialogOpen(false);
     } catch (error) {
-      toast.error("Failed to reject transaction");
+      toast.error("Failed to reject transaction", { id: loadingToast });
     }
   };
 
@@ -347,8 +346,8 @@ const Approvals: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button onClick={handleApprove} disabled={!signature}>
-              Approve
+            <Button onClick={handleApprove} disabled={!signature || approveIncoming.isPending || approveOutgoing.isPending || approveRequest.isPending || approvePO.isPending}>
+              {approveIncoming.isPending || approveOutgoing.isPending || approveRequest.isPending || approvePO.isPending ? "Approving..." : "Approve"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -377,8 +376,8 @@ const Approvals: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleReject}>
-              Reject
+            <Button variant="destructive" onClick={handleReject} disabled={rejectIncoming.isPending || rejectOutgoing.isPending || rejectRequest.isPending || rejectPO.isPending}>
+              {rejectIncoming.isPending || rejectOutgoing.isPending || rejectRequest.isPending || rejectPO.isPending ? "Rejecting..." : "Reject"}
             </Button>
           </DialogFooter>
         </DialogContent>

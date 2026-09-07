@@ -50,14 +50,14 @@ module.exports = async function handler(req, res) {
       });
 
       for (const item of approvedOutgoing.items) {
-        await tx.item.update({
-          where: { id: item.itemId },
-          data: { currentStock: { decrement: item.quantity } },
-        });
-
         const itemBefore = await tx.item.findUnique({ where: { id: item.itemId } });
         const previousStock = itemBefore.currentStock;
         const newStock = previousStock - item.quantity;
+
+        await tx.item.update({
+          where: { id: item.itemId },
+          data: { currentStock: newStock },
+        });
 
         await tx.stockMovement.create({
           data: {
@@ -78,7 +78,7 @@ module.exports = async function handler(req, res) {
         approvedItemCount: approvedOutgoing.items.length,
         rejectedItemCount: rejectedItemIds ? rejectedItemIds.length : 0,
       };
-    });
+    }, { timeout: 15000 });
 
     return res.status(200).json(result);
   } catch (error) {

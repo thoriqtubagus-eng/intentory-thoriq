@@ -10,7 +10,7 @@ module.exports = async function handler(req, res) {
   try {
     const user = await authenticate(req);
     if (!user) return jsonError(res, 401, "Unauthorized");
-    if (!authorize(user, "admin", "warehouse_staff", "head_of_warehouse")) {
+    if (!authorize(user, "admin", "head_of_warehouse")) {
       return jsonError(res, 403, "Forbidden");
     }
 

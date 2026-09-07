@@ -89,7 +89,7 @@ module.exports = async function handler(req, res) {
         approvedItemCount: approvedItems.length,
         rejectedItemCount: rejectedItemIds ? rejectedItemIds.length : 0,
       };
-    });
+    }, { timeout: 15000 });
 
     return res.status(200).json({
       incomingId: result.incoming.id,
