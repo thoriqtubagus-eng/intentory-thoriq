@@ -45,8 +45,8 @@ const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-48 h-48 mb-4">
-            <img src={logo} alt="Logo JPB" className="w-full h-full" />
+          <div className="inline-flex items-center justify-center w-48 mb-4">
+            <img src={logo} alt="Logo JPB" className="w-full" style={{ aspectRatio: "1.09/1", objectFit: "contain" }} />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
             PT. JAYA PERKASA BOJONEGARA
