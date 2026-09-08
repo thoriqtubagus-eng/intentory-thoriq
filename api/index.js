@@ -157,7 +157,7 @@ const routes = {
   "POST /api/suppliers": async (req, res) => {
     const user = await authenticate(req);
     if (!user) return jsonError(res, 401, "Unauthorized");
-    if (!authorize(user, "admin", "purchasing")) return jsonError(res, 403, "Forbidden");
+    if (!authorize(user, "admin", "warehouse_staff", "divisi")) return jsonError(res, 403, "Forbidden");
     const body = await parseBody(req);
     const { name, contactName, email, phone, address } = body;
     if (!name) return jsonError(res, 400, "Name is required");
@@ -317,7 +317,7 @@ async function handleDynamicRoute(method, path, req, res) {
       return res.status(200).json(await prisma.category.update({ where: { id }, data: body }));
     }
     if (method === "DELETE") {
-      if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
+      if (!authorize(user, "admin", "warehouse_staff", "divisi")) return jsonError(res, 403, "Forbidden");
       await prisma.category.delete({ where: { id } });
       return res.status(200).json({ message: "Category deleted successfully" });
     }
@@ -355,12 +355,12 @@ async function handleDynamicRoute(method, path, req, res) {
       return res.status(200).json(s);
     }
     if (method === "PUT") {
-      if (!authorize(user, "admin", "purchasing")) return jsonError(res, 403, "Forbidden");
+      if (!authorize(user, "admin", "warehouse_staff", "divisi")) return jsonError(res, 403, "Forbidden");
       const body = await parseBody(req);
       return res.status(200).json(await prisma.supplier.update({ where: { id }, data: body }));
     }
     if (method === "DELETE") {
-      if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
+      if (!authorize(user, "admin", "warehouse_staff", "divisi")) return jsonError(res, 403, "Forbidden");
       await prisma.supplier.delete({ where: { id } });
       return res.status(200).json({ message: "Supplier deleted successfully" });
     }
@@ -402,6 +402,7 @@ async function handleDynamicRoute(method, path, req, res) {
     }
 
     if (method === "POST" && action === "submit") {
+      if (!authorize(user, "admin", "warehouse_staff")) return jsonError(res, 403, "Forbidden");
       const existing = await prisma.incomingGoods.findUnique({ where: { id } });
       if (!existing) return jsonError(res, 404, "Incoming goods not found");
       if (existing.status !== "DRAFT") return jsonError(res, 400, "Only DRAFT can be submitted");
@@ -464,7 +465,7 @@ async function handleDynamicRoute(method, path, req, res) {
     }
 
     if (method === "DELETE" && !action) {
-      if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
+      if (!authorize(user, "admin", "warehouse_staff")) return jsonError(res, 403, "Forbidden");
       await prisma.outgoingGoodsItem.deleteMany({ where: { outgoingGoodsId: id } });
       await prisma.outgoingGoods.delete({ where: { id } });
       return res.status(200).json({ message: "Outgoing good deleted successfully" });
@@ -537,7 +538,7 @@ async function handleDynamicRoute(method, path, req, res) {
     }
 
     if (method === "DELETE" && !action) {
-      if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
+      if (!authorize(user, "admin", "divisi")) return jsonError(res, 403, "Forbidden");
       await prisma.purchaseOrderItem.deleteMany({ where: { purchaseOrderId: id } });
       await prisma.purchaseOrder.delete({ where: { id } });
       return res.status(200).json({ message: "Purchase order deleted successfully" });
