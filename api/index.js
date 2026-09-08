@@ -318,8 +318,6 @@ async function handleDynamicRoute(method, path, req, res) {
     }
     if (method === "DELETE") {
       if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
-      const itemCount = await prisma.item.count({ where: { categoryId: id } });
-      if (itemCount > 0) return jsonError(res, 400, `Cannot delete category: ${itemCount} item(s) still use this category. Move or delete them first.`);
       await prisma.category.delete({ where: { id } });
       return res.status(200).json({ message: "Category deleted successfully" });
     }
@@ -363,9 +361,6 @@ async function handleDynamicRoute(method, path, req, res) {
     }
     if (method === "DELETE") {
       if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
-      const inCount = await prisma.incomingGoods.count({ where: { supplierId: id } });
-      const poCount = await prisma.purchaseOrder.count({ where: { supplierId: id } });
-      if (inCount > 0 || poCount > 0) return jsonError(res, 400, `Cannot delete supplier: ${inCount} incoming good(s) and ${poCount} purchase order(s) reference it.`);
       await prisma.supplier.delete({ where: { id } });
       return res.status(200).json({ message: "Supplier deleted successfully" });
     }

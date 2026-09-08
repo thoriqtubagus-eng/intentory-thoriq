@@ -88,7 +88,7 @@ model Item {
   sku          String   @unique
   name         String
   description  String?
-  categoryId   String
+  categoryId   String?
   unit         String
   minStock     Int      @default(0)
   currentStock Int      @default(0)
@@ -96,7 +96,7 @@ model Item {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  category           Category            @relation(fields: [categoryId], references: [id])
+  category           Category?           @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   itemRequestsItems  ItemRequestItem[]
   incomingGoodsItems IncomingGoodsItem[]
   outgoingGoodsItems OutgoingGoodsItem[]
@@ -140,7 +140,7 @@ model IncomingGoods {
   id                String            @id @default(uuid())
   transactionNumber String            @unique
   referenceNumber   String?
-  supplierId        String
+  supplierId        String?
   receivedById      String
   receivedAt        DateTime          @default(now())
   notes             String?
@@ -155,7 +155,7 @@ model IncomingGoods {
   createdById       String
 
   createdBy  User                @relation("IncomingGoodsCreatedBy", fields: [createdById], references: [id])
-  supplier   Supplier            @relation(fields: [supplierId], references: [id])
+  supplier   Supplier?           @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   receivedBy User                @relation(fields: [receivedById], references: [id])
   items      IncomingGoodsItem[]
 }
@@ -222,7 +222,7 @@ model StockMovement {
 model PurchaseOrder {
   id             String            @id @default(uuid())
   orderNumber    String            @unique
-  supplierId     String
+  supplierId     String?
   status         TransactionStatus @default(DRAFT)
   totalAmount    Float             @default(0)
   notes          String?
@@ -236,7 +236,7 @@ model PurchaseOrder {
   createdById    String
 
   createdBy  User                @relation(fields: [createdById], references: [id])
-  supplier   Supplier            @relation(fields: [supplierId], references: [id])
+  supplier   Supplier?           @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   approvedBy User?               @relation("POApprovedBy", fields: [approvedById], references: [id])
   items      PurchaseOrderItem[]
 }
