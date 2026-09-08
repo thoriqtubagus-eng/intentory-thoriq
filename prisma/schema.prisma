@@ -127,13 +127,13 @@ model ItemRequest {
 }
 
 model ItemRequestItem {
-  id            String @id @default(uuid())
+  id            String  @id @default(uuid())
   itemRequestId String
-  itemId        String
+  itemId        String?
   quantity      Int
 
   itemRequest ItemRequest @relation(fields: [itemRequestId], references: [id], onDelete: Cascade)
-  item        Item        @relation(fields: [itemId], references: [id])
+  item        Item?       @relation(fields: [itemId], references: [id], onDelete: SetNull)
 }
 
 model IncomingGoods {
@@ -161,14 +161,14 @@ model IncomingGoods {
 }
 
 model IncomingGoodsItem {
-  id              String @id @default(uuid())
+  id              String  @id @default(uuid())
   incomingGoodsId String
-  itemId          String
+  itemId          String?
   quantity        Int
   unitPrice       Float?
 
   incomingGoods IncomingGoods @relation(fields: [incomingGoodsId], references: [id], onDelete: Cascade)
-  item          Item          @relation(fields: [itemId], references: [id])
+  item          Item?         @relation(fields: [itemId], references: [id], onDelete: SetNull)
 }
 
 model OutgoingGoods {
@@ -194,18 +194,18 @@ model OutgoingGoods {
 }
 
 model OutgoingGoodsItem {
-  id              String @id @default(uuid())
+  id              String  @id @default(uuid())
   outgoingGoodsId String
-  itemId          String
+  itemId          String?
   quantity        Int
 
   outgoingGoods OutgoingGoods @relation(fields: [outgoingGoodsId], references: [id], onDelete: Cascade)
-  item          Item          @relation(fields: [itemId], references: [id])
+  item          Item?         @relation(fields: [itemId], references: [id], onDelete: SetNull)
 }
 
 model StockMovement {
-  id            String       @id @default(uuid())
-  itemId        String
+  id            String        @id @default(uuid())
+  itemId        String?
   type          MovementType
   quantity      Int
   previousStock Int
@@ -213,10 +213,10 @@ model StockMovement {
   reference     String?
   notes         String?
   performedById String
-  createdAt     DateTime     @default(now())
+  createdAt     DateTime      @default(now())
 
-  item        Item @relation(fields: [itemId], references: [id])
-  performedBy User @relation(fields: [performedById], references: [id])
+  item        Item? @relation(fields: [itemId], references: [id], onDelete: SetNull)
+  performedBy User  @relation(fields: [performedById], references: [id])
 }
 
 model PurchaseOrder {
@@ -242,12 +242,12 @@ model PurchaseOrder {
 }
 
 model PurchaseOrderItem {
-  id              String @id @default(uuid())
+  id              String  @id @default(uuid())
   purchaseOrderId String
-  itemId          String
+  itemId          String?
   quantity        Int
   // unitPrice       Float
 
   purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
-  item          Item          @relation(fields: [itemId], references: [id])
+  item          Item?         @relation(fields: [itemId], references: [id], onDelete: SetNull)
 }
