@@ -78,7 +78,8 @@ const Categories: React.FC = () => {
       toast.success('Category deleted successfully', { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error('Failed to delete category', { id: loadingToast });
+      const msg = error?.response?.data?.error || error?.message || 'Failed to delete category';
+      toast.error(msg, { id: loadingToast });
     }
   };
 

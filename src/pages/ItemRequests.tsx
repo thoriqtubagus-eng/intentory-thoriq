@@ -222,7 +222,8 @@ const ItemRequests: React.FC = () => {
       toast.success("Request deleted successfully", { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error("Failed to delete request", { id: loadingToast });
+      const msg = error?.response?.data?.error || error?.message || "Failed to delete request";
+      toast.error(msg, { id: loadingToast });
     }
   };
 

@@ -273,7 +273,8 @@ const IncomingGoods: React.FC = () => {
       toast.success("Transaction deleted successfully", { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error("Failed to delete transaction", { id: loadingToast });
+      const msg = error?.response?.data?.error || error?.message || "Failed to delete transaction";
+      toast.error(msg, { id: loadingToast });
     }
   };
 

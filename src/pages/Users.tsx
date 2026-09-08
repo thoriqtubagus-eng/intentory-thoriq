@@ -107,7 +107,8 @@ const Users: React.FC = () => {
       toast.success('User deleted successfully', { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error('Failed to delete user', { id: loadingToast });
+      const msg = error?.response?.data?.error || error?.message || 'Failed to delete user';
+      toast.error(msg, { id: loadingToast });
     }
   };
 

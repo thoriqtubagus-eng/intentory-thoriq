@@ -181,8 +181,9 @@ const Items: React.FC = () => {
       await deleteItem.mutateAsync(deleteId);
       toast.success("Item deleted successfully", { id: loadingToast });
       setDeleteId(null);
-    } catch (error) {
-      toast.error("Failed to delete item", { id: loadingToast });
+    } catch (error: any) {
+      const msg = error?.response?.data?.error || error?.message || "Failed to delete item";
+      toast.error(msg, { id: loadingToast });
     }
   };
 

@@ -238,7 +238,8 @@ const PurchaseOrders: React.FC = () => {
       toast.success("Order deleted successfully", { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error("Failed to delete order", { id: loadingToast });
+      const msg = error?.response?.data?.error || error?.message || "Failed to delete order";
+      toast.error(msg, { id: loadingToast });
     }
   };
 

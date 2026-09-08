@@ -92,7 +92,8 @@ const Suppliers: React.FC = () => {
       toast.success('Supplier deleted successfully', { id: loadingToast });
       setDeleteId(null);
     } catch (error) {
-      toast.error('Failed to delete supplier', { id: loadingToast });
+      const msg = error?.response?.data?.error || error?.message || 'Failed to delete supplier';
+      toast.error(msg, { id: loadingToast });
     }
   };
 
