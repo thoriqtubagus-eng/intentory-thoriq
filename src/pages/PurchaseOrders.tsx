@@ -310,15 +310,13 @@ const PurchaseOrders: React.FC = () => {
       doc.setFontSize(20);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(33, 33, 33);
-      // doc.text("NAMA PT/PERUSAHAAN DISINI", 105, 20, { align: "center" });
-      doc.text("PT SAMUDRA MARINE INDONESIA", 105, 20, { align: "center" });
+      doc.text("PT. JAYA PERKASA BOJONEGARA", 105, 20, { align: "center" });
 
       doc.setFontSize(12);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(100, 100, 100);
-      // doc.text("ALAMAT PT/PERUSAHAAN DISINI", 105, 28, { align: "center" });
       doc.text(
-        "Kp. Lumalang, Desa Bojonegara, Kec. Bojonegara, Kab. Serang, Banten, Indonesia, 42454",
+        "Kp. Banjar, Desa Bojonegara, Kec. Bojonegara, Kab. Serang, Provinsi Banten, Kode Pos 42454",
         105,
         28,
         { align: "center" }
