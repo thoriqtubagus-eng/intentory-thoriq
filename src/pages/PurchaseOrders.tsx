@@ -724,10 +724,12 @@ const PurchaseOrders: React.FC = () => {
           </h1>
           <p className="text-muted-foreground">Manage purchase orders</p>
         </div>
-        <Button onClick={openCreateDialog}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Order
-        </Button>
+        {(user?.role === "admin" || user?.role === "divisi") && (
+          <Button onClick={openCreateDialog}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Order
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -875,7 +877,7 @@ const PurchaseOrders: React.FC = () => {
                           >
                             <FileText className="h-4 w-4 text-orange-400" />
                           </Button>
-                          {o.status === "DRAFT" && (
+                          {o.status === "DRAFT" && user?.role !== "head_of_warehouse" && (
                             <>
                               <Button
                                 variant="ghost"
