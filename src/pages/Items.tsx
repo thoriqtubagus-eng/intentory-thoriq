@@ -194,10 +194,12 @@ const Items: React.FC = () => {
           <h1 className="text-2xl font-bold text-foreground">Items</h1>
           <p className="text-muted-foreground">Manage inventory items</p>
         </div>
-        <Button onClick={openCreateDialog}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Item
-        </Button>
+        {user?.role !== "head_of_warehouse" && (
+          <Button onClick={openCreateDialog}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Item
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -291,7 +293,8 @@ const Items: React.FC = () => {
                     <TableHead>Unit</TableHead>
                     <TableHead>Location</TableHead>
                     {(user?.role === "admin" ||
-                      user?.role === "warehouse_staff") && (
+                      user?.role === "warehouse_staff" ||
+                      user?.role === "divisi") && (
                       <TableHead className="w-[100px]">Actions</TableHead>
                     )}
                   </TableRow>
@@ -319,7 +322,8 @@ const Items: React.FC = () => {
                       <TableCell>{item.unit}</TableCell>
                       <TableCell>{item.location}</TableCell>
                       {(user?.role === "admin" ||
-                        user?.role === "warehouse_staff") && (
+                        user?.role === "warehouse_staff" ||
+                        user?.role === "divisi") && (
                         <TableCell>
                           <div className="flex gap-1">
                             <Button

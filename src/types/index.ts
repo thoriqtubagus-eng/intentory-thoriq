@@ -148,6 +148,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   warehouse_staff: 'Warehouse Staff',
   department_user: 'Department User',
   head_of_warehouse: 'Head of Warehouse',
+  divisi: 'Divisi',
 };
 
 // Status Labels
