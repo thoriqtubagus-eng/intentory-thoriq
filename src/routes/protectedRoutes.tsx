@@ -36,27 +36,27 @@ export const protectedRoutes = [
   {
     path: "/categories",
     element: <Categories />,
-    roles: [ROLES.ADMIN, ROLES.WAREHOUSE, ROLES.DIVISI],
+    roles: [ROLES.ADMIN, ROLES.WAREHOUSE, ROLES.HEAD_OF_WAREHOUSE, ROLES.DIVISI],
   },
   {
     path: "/suppliers",
     element: <Suppliers />,
-    roles: [ROLES.ADMIN, ROLES.WAREHOUSE, ROLES.DIVISI],
+    roles: [ROLES.ADMIN, ROLES.WAREHOUSE, ROLES.HEAD_OF_WAREHOUSE, ROLES.DIVISI],
   },
   {
     path: "/incoming-goods",
     element: <IncomingGoods />,
-    roles: [ROLES.ADMIN, ROLES.WAREHOUSE],
+    roles: [ROLES.ADMIN, ROLES.WAREHOUSE, ROLES.HEAD_OF_WAREHOUSE],
   },
   {
     path: "/outgoing-goods",
     element: <OutgoingGoods />,
-    roles: [ROLES.ADMIN, ROLES.WAREHOUSE],
+    roles: [ROLES.ADMIN, ROLES.WAREHOUSE, ROLES.HEAD_OF_WAREHOUSE],
   },
   {
     path: "/purchase-orders",
     element: <PurchaseOrders />,
-    roles: [ROLES.ADMIN, ROLES.DIVISI],
+    roles: [ROLES.ADMIN, ROLES.HEAD_OF_WAREHOUSE, ROLES.DIVISI],
   },
   {
     path: "/users",

@@ -48,13 +48,13 @@ const navItems: NavItem[] = [
     title: "Categories",
     href: "/categories",
     icon: Tags,
-    roles: ["admin", "warehouse_staff", "divisi"],
+    roles: ["admin", "warehouse_staff", "head_of_warehouse", "divisi"],
   },
   {
     title: "Suppliers",
     href: "/suppliers",
     icon: Truck,
-    roles: ["admin", "warehouse_staff", "divisi"],
+    roles: ["admin", "warehouse_staff", "head_of_warehouse", "divisi"],
   },
   {
     title: "Users",
@@ -66,13 +66,13 @@ const navItems: NavItem[] = [
     title: "Incoming Goods",
     href: "/incoming-goods",
     icon: PackagePlus,
-    roles: ["admin", "warehouse_staff"],
+    roles: ["admin", "warehouse_staff", "head_of_warehouse"],
   },
   {
     title: "Outgoing Goods",
     href: "/outgoing-goods",
     icon: PackageMinus,
-    roles: ["admin", "warehouse_staff"],
+    roles: ["admin", "warehouse_staff", "head_of_warehouse"],
   },
   // {
   //   title: "Item Requests",
@@ -84,7 +84,7 @@ const navItems: NavItem[] = [
     title: "Purchase Orders",
     href: "/purchase-orders",
     icon: ShoppingCart,
-    roles: ["admin", "divisi"],
+    roles: ["admin", "head_of_warehouse", "divisi"],
   },
   {
     title: "Approvals",

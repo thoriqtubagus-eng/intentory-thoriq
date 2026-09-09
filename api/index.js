@@ -417,7 +417,7 @@ async function handleDynamicRoute(method, path, req, res) {
       const body = await parseBody(req);
       const result = await prisma.$transaction(async (tx) => {
         if (body.items && Array.isArray(body.items) && body.items.length > 0) {
-          await tx.incomingGoodsItem.deleteMany({ where: { incomingGoodsId: id, id: { in: body.items } } });
+          await tx.incomingGoodsItem.deleteMany({ where: { incomingGoodsId: id, itemId: { in: body.items } } });
         }
         const approvedItems = await tx.incomingGoodsItem.findMany({ where: { incomingGoodsId: id } });
         for (const ii of approvedItems) {
@@ -434,8 +434,11 @@ async function handleDynamicRoute(method, path, req, res) {
     if (method === "POST" && action === "reject") {
       if (!authorize(user, "admin", "head_of_warehouse")) return jsonError(res, 403, "Forbidden");
       const body = await parseBody(req);
-      const updated = await prisma.incomingGoods.update({ where: { id }, data: { status: "REJECTED", rejectReason: body.reason || null }, include: INCL_INCOMING });
-      return res.status(200).json(updated);
+      const result = await prisma.$transaction(async (tx) => {
+        await tx.incomingGoodsItem.deleteMany({ where: { incomingGoodsId: id } });
+        return tx.incomingGoods.update({ where: { id }, data: { status: "REJECTED", rejectReason: body.reason || null }, include: INCL_INCOMING });
+      }, { timeout: 15000 });
+      return res.status(200).json(result);
     }
   }
 
@@ -486,8 +489,8 @@ async function handleDynamicRoute(method, path, req, res) {
       if (outgoing.status !== "WAITING_APPROVAL") return jsonError(res, 400, "Only WAITING_APPROVAL can be approved");
       const body = await parseBody(req);
       const result = await prisma.$transaction(async (tx) => {
-        if (body.items && body.items.length > 0) {
-          await tx.outgoingGoodsItem.deleteMany({ where: { id: { in: body.items } } });
+        if (body.items && Array.isArray(body.items) && body.items.length > 0) {
+          await tx.outgoingGoodsItem.deleteMany({ where: { outgoingGoodsId: id, itemId: { in: body.items } } });
         }
         const updated = await tx.outgoingGoods.update({ where: { id }, data: { status: "APPROVED", approvedAt: new Date(), approvedById: user.id, signatureImage: body.signatureImage || null }, include: { items: true } });
         for (const item of updated.items) {
@@ -503,8 +506,11 @@ async function handleDynamicRoute(method, path, req, res) {
     if (method === "POST" && action === "reject") {
       if (!authorize(user, "admin", "head_of_warehouse")) return jsonError(res, 403, "Forbidden");
       const body = await parseBody(req);
-      const updated = await prisma.outgoingGoods.update({ where: { id }, data: { status: "REJECTED", rejectReason: body.reason || null } });
-      return res.status(200).json(updated);
+      const result = await prisma.$transaction(async (tx) => {
+        await tx.outgoingGoodsItem.deleteMany({ where: { outgoingGoodsId: id } });
+        return tx.outgoingGoods.update({ where: { id }, data: { status: "REJECTED", rejectReason: body.reason || null } });
+      }, { timeout: 15000 });
+      return res.status(200).json(result);
     }
   }
 
@@ -564,7 +570,11 @@ async function handleDynamicRoute(method, path, req, res) {
     if (method === "POST" && action === "reject") {
       if (!authorize(user, "admin", "head_of_warehouse")) return jsonError(res, 403, "Forbidden");
       const body = await parseBody(req);
-      return res.status(200).json(await prisma.purchaseOrder.update({ where: { id }, data: { status: "REJECTED", rejectReason: body.reason || null } }));
+      const result = await prisma.$transaction(async (tx) => {
+        await tx.purchaseOrderItem.deleteMany({ where: { purchaseOrderId: id } });
+        return tx.purchaseOrder.update({ where: { id }, data: { status: "REJECTED", rejectReason: body.reason || null } });
+      }, { timeout: 15000 });
+      return res.status(200).json(result);
     }
   }
 
@@ -621,7 +631,11 @@ async function handleDynamicRoute(method, path, req, res) {
     if (method === "POST" && action === "reject") {
       if (!authorize(user, "admin", "head_of_warehouse")) return jsonError(res, 403, "Forbidden");
       const body = await parseBody(req);
-      return res.status(200).json(await prisma.itemRequest.update({ where: { id }, data: { status: "REJECTED", rejectReason: body.reason || null } }));
+      const result = await prisma.$transaction(async (tx) => {
+        await tx.itemRequestItem.deleteMany({ where: { itemRequestId: id } });
+        return tx.itemRequest.update({ where: { id }, data: { status: "REJECTED", rejectReason: body.reason || null } });
+      }, { timeout: 15000 });
+      return res.status(200).json(result);
     }
   }
 
