@@ -120,7 +120,7 @@ const routes = {
   "POST /api/categories": async (req, res) => {
     const user = await authenticate(req);
     if (!user) return jsonError(res, 401, "Unauthorized");
-    if (!authorize(user, "admin", "warehouse_staff")) return jsonError(res, 403, "Forbidden");
+    if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
     const body = await parseBody(req);
     const { name, description } = body;
     if (!name) return jsonError(res, 400, "Name is required");
@@ -136,7 +136,7 @@ const routes = {
   "POST /api/items": async (req, res) => {
     const user = await authenticate(req);
     if (!user) return jsonError(res, 401, "Unauthorized");
-    if (!authorize(user, "admin", "warehouse_staff")) return jsonError(res, 403, "Forbidden");
+    if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
     const body = await parseBody(req);
     const { name, description, categoryId, unit, minStock, stock, location } = body;
     if (!name || !categoryId || !unit) return jsonError(res, 400, "name, categoryId, and unit are required");
@@ -157,7 +157,7 @@ const routes = {
   "POST /api/suppliers": async (req, res) => {
     const user = await authenticate(req);
     if (!user) return jsonError(res, 401, "Unauthorized");
-    if (!authorize(user, "admin", "warehouse_staff", "divisi")) return jsonError(res, 403, "Forbidden");
+    if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
     const body = await parseBody(req);
     const { name, contactName, email, phone, address } = body;
     if (!name) return jsonError(res, 400, "Name is required");
@@ -312,12 +312,12 @@ async function handleDynamicRoute(method, path, req, res) {
       return res.status(200).json(cat);
     }
     if (method === "PUT") {
-      if (!authorize(user, "admin", "warehouse_staff")) return jsonError(res, 403, "Forbidden");
+      if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
       const body = await parseBody(req);
       return res.status(200).json(await prisma.category.update({ where: { id }, data: body }));
     }
     if (method === "DELETE") {
-      if (!authorize(user, "admin", "warehouse_staff", "divisi")) return jsonError(res, 403, "Forbidden");
+      if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
       await prisma.category.delete({ where: { id } });
       return res.status(200).json({ message: "Category deleted successfully" });
     }
@@ -333,13 +333,13 @@ async function handleDynamicRoute(method, path, req, res) {
       return res.status(200).json(item);
     }
     if (method === "PUT") {
-      if (!authorize(user, "admin", "warehouse_staff")) return jsonError(res, 403, "Forbidden");
+      if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
       const body = await parseBody(req);
       const updated = await prisma.item.update({ where: { id }, data: { ...(body.code !== undefined && { sku: body.code }), ...(body.name !== undefined && { name: body.name }), ...(body.description !== undefined && { description: body.description }), ...(body.categoryId !== undefined && { categoryId: body.categoryId }), ...(body.unit !== undefined && { unit: body.unit }), ...(body.minStock !== undefined && { minStock: body.minStock }), ...(body.stock !== undefined && { currentStock: body.stock }), ...(body.location !== undefined && { location: body.location }) }, include: { category: true } });
       return res.status(200).json(updated);
     }
     if (method === "DELETE") {
-      if (!authorize(user, "admin", "warehouse_staff")) return jsonError(res, 403, "Forbidden");
+      if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
       await prisma.item.delete({ where: { id } });
       return res.status(200).json({ message: "Item deleted successfully" });
     }
@@ -355,12 +355,12 @@ async function handleDynamicRoute(method, path, req, res) {
       return res.status(200).json(s);
     }
     if (method === "PUT") {
-      if (!authorize(user, "admin", "warehouse_staff", "divisi")) return jsonError(res, 403, "Forbidden");
+      if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
       const body = await parseBody(req);
       return res.status(200).json(await prisma.supplier.update({ where: { id }, data: body }));
     }
     if (method === "DELETE") {
-      if (!authorize(user, "admin", "warehouse_staff", "divisi")) return jsonError(res, 403, "Forbidden");
+      if (!authorize(user, "admin")) return jsonError(res, 403, "Forbidden");
       await prisma.supplier.delete({ where: { id } });
       return res.status(200).json({ message: "Supplier deleted successfully" });
     }

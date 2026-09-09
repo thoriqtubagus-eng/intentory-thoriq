@@ -48,13 +48,13 @@ const navItems: NavItem[] = [
     title: "Categories",
     href: "/categories",
     icon: Tags,
-    roles: ["admin", "warehouse_staff", "divisi"],
+    roles: ["admin", "divisi"],
   },
   {
     title: "Suppliers",
     href: "/suppliers",
     icon: Truck,
-    roles: ["admin", "warehouse_staff", "divisi"],
+    roles: ["admin", "divisi"],
   },
   {
     title: "Users",

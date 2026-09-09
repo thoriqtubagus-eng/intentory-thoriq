@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier } from '@/hooks/useApi';
+import { useAuth } from '@/contexts/AuthContext';
 import { Supplier } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +26,7 @@ const supplierSchema = z.object({
 type SupplierFormData = z.infer<typeof supplierSchema>;
 
 const Suppliers: React.FC = () => {
+  const { user } = useAuth();
   const { data: suppliers = [], isLoading } = useSuppliers();
   const createSupplier = useCreateSupplier();
   const updateSupplier = useUpdateSupplier();
@@ -104,10 +106,12 @@ const Suppliers: React.FC = () => {
           <h1 className="text-2xl font-bold text-foreground">Suppliers</h1>
           <p className="text-muted-foreground">Manage supplier information</p>
         </div>
-        <Button onClick={openCreateDialog}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Supplier
-        </Button>
+        {user?.role === "admin" && (
+          <Button onClick={openCreateDialog}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Supplier
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -136,7 +140,9 @@ const Suppliers: React.FC = () => {
                     <TableHead>Contact Person</TableHead>
                     <TableHead>Phone</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead className="w-[100px]">Actions</TableHead>
+                    {user?.role === "admin" && (
+                      <TableHead className="w-[100px]">Actions</TableHead>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -146,16 +152,18 @@ const Suppliers: React.FC = () => {
                       <TableCell>{sup.contactName}</TableCell>
                       <TableCell>{sup.phone}</TableCell>
                       <TableCell className="text-muted-foreground">{sup.email}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => openEditDialog(sup)}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(sup.id)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                      {user?.role === "admin" && (
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => openEditDialog(sup)}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => setDeleteId(sup.id)}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
