@@ -36,12 +36,12 @@ export const protectedRoutes = [
   {
     path: "/categories",
     element: <Categories />,
-    roles: [ROLES.ADMIN, ROLES.DIVISI],
+    roles: [ROLES.ADMIN, ROLES.WAREHOUSE, ROLES.DIVISI],
   },
   {
     path: "/suppliers",
     element: <Suppliers />,
-    roles: [ROLES.ADMIN, ROLES.DIVISI],
+    roles: [ROLES.ADMIN, ROLES.WAREHOUSE, ROLES.DIVISI],
   },
   {
     path: "/incoming-goods",
