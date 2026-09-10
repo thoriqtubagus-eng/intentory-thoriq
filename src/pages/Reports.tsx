@@ -26,29 +26,68 @@ const Reports: React.FC = () => {
     a.click();
   };
 
+  const getItemName = (itemId: string) => items.find(i => i.id === itemId)?.name || 'Unknown';
+  const getItemCode = (itemId: string) => items.find(i => i.id === itemId)?.code || 'Unknown';
+
   const exportStock = () => {
     const data = items.map(i => ({ code: i.code, name: i.name, category: getCategoryName(i.categoryId), stock: i.stock, minStock: i.minStock, unit: i.unit, location: i.location }));
     exportToCSV(data, 'stock_report', ['code', 'name', 'category', 'stock', 'minStock', 'unit', 'location']);
   };
 
   const exportIncoming = () => {
-    const data = incomingGoods.filter(t => t.status === 'APPROVED').map(t => ({ transactionNumber: t.transactionNumber, referenceNumber: t.referenceNumber, receivedDate: t.receivedDate, status: t.status, approvedAt: t.approvedAt }));
-    exportToCSV(data, 'incoming_report', ['transactionNumber', 'referenceNumber', 'receivedDate', 'status', 'approvedAt']);
+    const rows: any[] = [];
+    incomingGoods.filter(t => t.status === 'APPROVED').forEach(t => {
+      if (t.items && t.items.length > 0) {
+        t.items.forEach((item: any) => {
+          rows.push({ transactionNumber: t.transactionNumber, itemCode: getItemCode(item.itemId), itemName: getItemName(item.itemId), quantity: item.quantity, referenceNumber: t.referenceNumber, receivedDate: t.receivedDate, status: t.status, approvedAt: t.approvedAt });
+        });
+      } else {
+        rows.push({ transactionNumber: t.transactionNumber, itemCode: '', itemName: '', quantity: '', referenceNumber: t.referenceNumber, receivedDate: t.receivedDate, status: t.status, approvedAt: t.approvedAt });
+      }
+    });
+    exportToCSV(rows, 'incoming_report', ['transactionNumber', 'itemCode', 'itemName', 'quantity', 'referenceNumber', 'receivedDate', 'status', 'approvedAt']);
   };
 
   const exportOutgoing = () => {
-    const data = outgoingGoods.filter(t => t.status === 'APPROVED').map(t => ({ transactionNumber: t.transactionNumber, destination: t.destination, requestedBy: t.requestedBy, status: t.status, approvedAt: t.approvedAt }));
-    exportToCSV(data, 'outgoing_report', ['transactionNumber', 'destination', 'requestedBy', 'status', 'approvedAt']);
+    const rows: any[] = [];
+    outgoingGoods.filter(t => t.status === 'APPROVED').forEach(t => {
+      if (t.items && t.items.length > 0) {
+        t.items.forEach((item: any) => {
+          rows.push({ transactionNumber: t.transactionNumber, itemCode: getItemCode(item.itemId), itemName: getItemName(item.itemId), quantity: item.quantity, destination: t.destination, requestedBy: t.requestedBy, status: t.status, approvedAt: t.approvedAt });
+        });
+      } else {
+        rows.push({ transactionNumber: t.transactionNumber, itemCode: '', itemName: '', quantity: '', destination: t.destination, requestedBy: t.requestedBy, status: t.status, approvedAt: t.approvedAt });
+      }
+    });
+    exportToCSV(rows, 'outgoing_report', ['transactionNumber', 'itemCode', 'itemName', 'quantity', 'destination', 'requestedBy', 'status', 'approvedAt']);
   };
 
   const exportRequests = () => {
-    const data = itemRequests.map(r => ({ transactionNumber: r.transactionNumber, department: r.department, requestedBy: r.requestedBy, requiredDate: r.requiredDate, status: r.status }));
-    exportToCSV(data, 'requests_report', ['transactionNumber', 'department', 'requestedBy', 'requiredDate', 'status']);
+    const rows: any[] = [];
+    itemRequests.forEach(r => {
+      if (r.items && r.items.length > 0) {
+        r.items.forEach((item: any) => {
+          rows.push({ transactionNumber: r.transactionNumber, itemCode: getItemCode(item.itemId), itemName: getItemName(item.itemId), quantity: item.quantity, department: r.department, requestedBy: r.requestedBy, requiredDate: r.requiredDate, status: r.status });
+        });
+      } else {
+        rows.push({ transactionNumber: r.transactionNumber, itemCode: '', itemName: '', quantity: '', department: r.department, requestedBy: r.requestedBy, requiredDate: r.requiredDate, status: r.status });
+      }
+    });
+    exportToCSV(rows, 'requests_report', ['transactionNumber', 'itemCode', 'itemName', 'quantity', 'department', 'requestedBy', 'requiredDate', 'status']);
   };
 
   const exportPurchaseOrders = () => {
-    const data = purchaseOrders.map(p => ({ transactionNumber: p.transactionNumber, expectedDate: p.expectedDate, status: p.status, approvedAt: p.approvedAt }));
-    exportToCSV(data, 'purchase_orders_report', ['transactionNumber', 'expectedDate', 'status', 'approvedAt']);
+    const rows: any[] = [];
+    purchaseOrders.forEach(p => {
+      if (p.items && p.items.length > 0) {
+        p.items.forEach((item: any) => {
+          rows.push({ orderNumber: p.orderNumber, itemCode: getItemCode(item.itemId), itemName: getItemName(item.itemId), quantity: item.quantity, expectedDate: p.expectedDate, status: p.status, approvedAt: p.approvedAt });
+        });
+      } else {
+        rows.push({ orderNumber: p.orderNumber, itemCode: '', itemName: '', quantity: '', expectedDate: p.expectedDate, status: p.status, approvedAt: p.approvedAt });
+      }
+    });
+    exportToCSV(rows, 'purchase_orders_report', ['orderNumber', 'itemCode', 'itemName', 'quantity', 'expectedDate', 'status', 'approvedAt']);
   };
 
   return (
