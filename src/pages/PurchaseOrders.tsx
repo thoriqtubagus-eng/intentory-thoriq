@@ -61,6 +61,8 @@ import {
   FileText,
 } from "lucide-react";
 import { format } from "date-fns";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const PurchaseOrders: React.FC = () => {
   const { user } = useAuth();
